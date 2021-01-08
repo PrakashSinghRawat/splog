@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head>
+    <title>Meeting</title>
+    <meta charset="utf-8" />
+    <link type="text/css" rel="stylesheet" href="https://source.zoom.us/1.7.8/css/bootstrap.css"/>
+    <link type="text/css" rel="stylesheet" href="https://source.zoom.us/1.7.8/css/react-select.css"/>
+    <meta name="format-detection" content="telephone=no">
+</head>
+<body>
+<style>
+    body {
+        padding-top: 50px;
+    }
+</style>
+
+<nav id="nav-tool" class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Meeting</a>
+        </div>
+    </div>
+</nav>
+
+
+<script src="https://source.zoom.us/1.8.1/lib/vendor/react.min.js"></script>
+<script src="https://source.zoom.us/1.8.1/lib/vendor/react-dom.min.js"></script>
+<script src="https://source.zoom.us/1.8.1/lib/vendor/redux.min.js"></script>
+<script src="https://source.zoom.us/1.8.1/lib/vendor/redux-thunk.min.js"></script>
+<script src="https://source.zoom.us/1.8.1/lib/vendor/jquery.min.js"></script>
+<script src="https://source.zoom.us/1.8.1/lib/vendor/lodash.min.js"></script>
+<script src="https://source.zoom.us/zoom-meeting-1.8.1.min.js"></script>
+<!-- <script src="js/index.js"></script> -->
+
+<script>
+    (function(){
+
+console.log('checkSystemRequirements');
+console.log(JSON.stringify(ZoomMtg.checkSystemRequirements()));
+
+// it's option if you want to change the WebSDK dependency link resources.
+// ZoomMtg.setZoomJSLib('https://source.zoom.us/1.7.8/lib', '/av'); // CDN version default
+// ZoomMtg.setZoomJSLib('https://jssdk.zoomus.cn/1.7.8/lib', '/av'); // china cdn option
+// ZoomMtg.setZoomJSLib('http://localhost:9999/node_modules/@zoomus/websdk/dist/lib', '/av'); // Local version default
+
+
+
+ZoomMtg.preLoadWasm();
+
+ZoomMtg.prepareJssdk();
+
+/**
+ * NEVER PUT YOUR ACTUAL API SECRET IN CLIENT SIDE CODE, THIS IS JUST FOR QUICK PROTOTYPING
+ * The below generateSignature should be done server side as not to expose your api secret in public
+ * You can find an eaxmple in here: https://marketplace.zoom.us/docs/sdk/native-sdks/Web-Client-SDK/tutorial/generate-signature
+ */
+
+var meetConfig = {
+        meetingNumber: <%=mtg.id%>,
+        userName: "<%=personName%>",
+        passWord: "<%=mtg.password%>",
+        leaveUrl: "/api/meeting/<%=mtg.id%>/end",
+        role: 0
+    };
+
+
+    ZoomMtg.init({
+        leaveUrl: '/api/meeting/<%=mtg.id%>/end',
+        success: function () {
+            ZoomMtg.join(
+                {
+                    meetingNumber: meetConfig.meetingNumber,
+                    userName: meetConfig.userName,
+                    signature: "<%=signature%>",
+                    apiKey: "<%=apiKey%>",
+                    userEmail: 'email@gmail.com',
+                    passWord: meetConfig.passWord,
+                    success: function(res){
+                        $('#nav-tool').hide();
+                        console.log('join meeting success');
+                    },
+                    error: function(res) {
+                        console.log(res);
+                    }
+                }
+            );
+        },
+        error: function(res) {
+            console.log(res);
+        }
+    });
+
+})();
+
+</script>
+</body>
+</html>
